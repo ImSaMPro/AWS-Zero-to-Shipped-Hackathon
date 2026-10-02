@@ -1,0 +1,56 @@
+# ===== AWS / SAM build & deploy artifacts =====
+.aws-sam/
+samconfig.toml
+packaged.yaml
+*.packaged.yaml
+
+# ===== Credentials & secrets (never commit) =====
+.env
+.env.*
+*.env
+.env-backup/
+new-env/
+*.pem
+*.key
+*.ppk
+id_rsa*
+credentials
+aws-credentials*
+*secret*
+*secrets*
+*.secret
+*token*
+.aws/
+*.p12
+*.pfx
+
+# ===== AI / coding-agent config & local state =====
+.kiro/
+.kirocrew/
+.cursor/
+.aider*
+.claude/
+.continue/
+*.agent.json
+.mcp.json
+.ai/
+
+# ===== Python =====
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+
+# ===== Local scratch / logs / OS =====
+scratch/
+tmp/
+*.log
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ===== Editors =====
+.vscode/
+.idea/

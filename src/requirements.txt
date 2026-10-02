@@ -1,0 +1,2 @@
+# boto3/botocore ship in the Lambda Python 3.12 runtime; no extra deps needed.
+# Left intentionally minimal to keep the package tiny and the build fast.

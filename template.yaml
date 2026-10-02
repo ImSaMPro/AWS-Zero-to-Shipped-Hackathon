@@ -1,0 +1,59 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: ReliefRoute - minimal serverless verified aid dispatcher (Lambda Function URL + Bedrock Nova Lite + DynamoDB)
+
+Globals:
+  Function:
+    Runtime: python3.12
+    Architectures: [arm64]
+    MemorySize: 256
+    Timeout: 15
+
+Resources:
+  AppFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: app.handler
+      CodeUri: src/
+      FunctionUrlConfig:
+        AuthType: NONE                 # public live URL (hackathon gate)
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref DataTable
+          BEDROCK_MODEL_ID: amazon.nova-lite-v1:0
+          DAILY_PLAN_CAP: "2000"       # abuse guard: max /plan calls per day
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref DataTable
+        - Statement:
+            - Effect: Allow
+              Action: bedrock:InvokeModel
+              Resource: '*'
+
+  AppFunctionLogGroup:                 # explicit retention = cost control
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${AppFunction}
+      RetentionInDays: 7
+
+  DataTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      BillingMode: PAY_PER_REQUEST     # on-demand, scales to zero
+      AttributeDefinitions:
+        - AttributeName: pk
+          AttributeType: S
+      KeySchema:
+        - AttributeName: pk
+          KeyType: HASH
+      TimeToLiveSpecification:
+        AttributeName: ttl
+        Enabled: true
+
+Outputs:
+  AppUrl:
+    Description: Public live app URL (submit this to the hackathon)
+    Value: !GetAtt AppFunctionUrl.FunctionUrl
+  TableName:
+    Description: DynamoDB table name
+    Value: !Ref DataTable
